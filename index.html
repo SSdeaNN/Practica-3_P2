@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="diseño.css">
+    <title>Formulario con API</title>
+</head>
+<body>
+    <div class="container">
+        <!-- Formulario -->
+        <div class="form-container">
+            <h2>Registro de Usuario</h2>
+            <form id="userForm">
+                <div class="form-group">
+                    <label for="nombre">Nombre:</label>
+                    <input type="text" id="nombre" name="nombre" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="apellidos">Apellidos:</label>
+                    <input type="text" id="apellidos" name="apellidos" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="direccion">Dirección:</label>
+                    <input type="text" id="direccion" name="direccion" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="localidad">Localidad:</label>
+                    <select id="localidad" name="localidad" required>
+                        <option value="">Selecciona una localidad</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="municipio">Municipio:</label>
+                    <select id="municipio" name="municipio" required>
+                        <option value="">Selecciona un municipio</option>
+                    </select>
+                </div>
+
+                <button type="submit">Registrar Usuario</button>
+            </form>
+        </div>
+
+        <!-- Lista de Usuarios -->
+        <div class="user-list-container">
+            <h2>Lista de Usuarios</h2>
+            <ul id="userList"></ul>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
