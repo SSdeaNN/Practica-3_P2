@@ -4,38 +4,49 @@ document.addEventListener("DOMContentLoaded", () => {
     const localidadSelect = document.getElementById("localidad");
     const municipioSelect = document.getElementById("municipio");
 
-    // Lista de localidades y municipios de Yucatán (Ejemplo)
-    const localidades = {
-        "Mérida": ["Mérida"],
-        "Valladolid": ["Valladolid"],
-        "Tizimín": ["Tizimín"],
-        "Umán": ["Umán"],
-        "Progreso": ["Progreso"]
-    };
+    const API_URL = "http://localhost:3000"; 
 
-    // Llenar el select de localidades
-    for (let localidad in localidades) {
-        let option = document.createElement("option");
-        option.value = localidad;
-        option.textContent = localidad;
-        localidadSelect.appendChild(option);
+  
+    async function loadLocalidades() {
+        try {
+            const response = await fetch(`${API_URL}/localidades`);
+            if (!response.ok) throw new Error("Error al obtener localidades");
+            
+            const localidades = await response.json();
+            localidades.forEach(localidad => {
+                let option = document.createElement("option");
+                option.value = localidad.nombre;
+                option.textContent = localidad.nombre;
+                localidadSelect.appendChild(option);
+            });
+        } catch (error) {
+            console.error("Error cargando localidades:", error);
+        }
     }
 
-    // Cambiar municipios según la localidad seleccionada
-    localidadSelect.addEventListener("change", () => {
+ 
+    localidadSelect.addEventListener("change", async () => {
         municipioSelect.innerHTML = '<option value="">Selecciona un municipio</option>';
         let selectedLocalidad = localidadSelect.value;
-        if (localidades[selectedLocalidad]) {
-            localidades[selectedLocalidad].forEach(municipio => {
+        if (!selectedLocalidad) return;
+
+        try {
+            const response = await fetch(`${API_URL}/municipios/${selectedLocalidad}`);
+            if (!response.ok) throw new Error("Error al obtener municipios");
+
+            const municipios = await response.json();
+            municipios.forEach(municipio => {
                 let option = document.createElement("option");
-                option.value = municipio;
-                option.textContent = municipio;
+                option.value = municipio.nombre;
+                option.textContent = municipio.nombre;
                 municipioSelect.appendChild(option);
             });
+        } catch (error) {
+            console.error("Error cargando municipios:", error);
         }
     });
 
-    // Manejar envío del formulario
+   
     userForm.addEventListener("submit", async (event) => {
         event.preventDefault();
 
@@ -48,11 +59,9 @@ document.addEventListener("DOMContentLoaded", () => {
         };
 
         try {
-            const response = await fetch("https://reqres.in/api/users", { // API de prueba
+            const response = await fetch(`${API_URL}/usuarios`, {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(formData)
             });
 
@@ -66,33 +75,30 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // Función para agregar usuario a la lista
-    function addUserToList(user) {
-        const li = document.createElement("li");
-        li.textContent = `${user.nombre} ${user.apellidos} - ${user.localidad}, ${user.municipio}`;
-        userList.appendChild(li);
-    }
+ 
+   function addUserToList(user) {
+    const li = document.createElement("li");
+    li.innerHTML = `
+        <strong>${user.nombre} ${user.apellidos}</strong>
+        <p>${user.direccion}</p>
+        <small>${user.localidad}, ${user.municipio}</small>
+    `;
+    userList.appendChild(li);
+}
 
-    // Cargar lista de usuarios al iniciar (datos de prueba)
+   
     async function loadUsers() {
         try {
-            const response = await fetch("https://reqres.in/api/users?page=1"); // API de prueba
+            const response = await fetch(`${API_URL}/usuarios`);
             if (!response.ok) throw new Error("Error al cargar usuarios");
 
-            const data = await response.json();
-            data.data.forEach(user => {
-                const fakeUser = {
-                    nombre: user.first_name,
-                    apellidos: user.last_name,
-                    localidad: "Mérida", // Datos ficticios
-                    municipio: "Mérida"
-                };
-                addUserToList(fakeUser);
-            });
+            const users = await response.json();
+            users.forEach(user => addUserToList(user));
         } catch (error) {
             console.error("Error:", error);
         }
     }
 
+    loadLocalidades();
     loadUsers();
 });
